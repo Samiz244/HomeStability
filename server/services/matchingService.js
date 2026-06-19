@@ -33,6 +33,13 @@ export const matchingService = {
     if (urgentEviction && /\b211\b/.test(resource.name || '')) {
       return 'Call 211 to be routed to immediate local help'
     }
+    if (situation.concern === 'mortgage') {
+      if (/foreclos|mortgage|homesafe|homeowner/i.test(`${resource.name} ${resource.description || ''}`)) {
+        return 'Helps homeowners with mortgage or foreclosure hardship'
+      }
+      if (resource.category === 'Legal Aid') return 'Legal help for foreclosure and mortgage disputes'
+      if (/\b211\b/.test(resource.name || '')) return 'Call 211 to be routed to mortgage/foreclosure help'
+    }
     if (situation.status === 'eviction_risk' && resource.category === 'Rent & Financial Help') {
       return 'Direct rental assistance for eviction prevention'
     }
@@ -88,6 +95,16 @@ function scoreOne(situation, resource) {
   // Legal concern → legal aid
   if (situation.concern === 'legal' && resource.category === 'Legal Aid') {
     score += 30
+  }
+
+  // Mortgage / homeownership concern → legal aid + 211, and strongly favor
+  // foreclosure/mortgage-focused programs (e.g. Foreclosure Prevention, HomeSafe).
+  if (situation.concern === 'mortgage') {
+    if (resource.category === 'Legal Aid') score += 30
+    if (/\b211\b/.test(resource.name || '')) score += 25
+    if (/foreclos|mortgage|homesafe|homeowner/i.test(`${resource.name} ${resource.description || ''}`)) {
+      score += 40
+    }
   }
 
   // Income level matches stated eligibility

@@ -50,8 +50,19 @@ router.post('/', async (req, res) => {
     )}`,
   )
 
+  // The slim converse schema returns only {status, urgency} — it has no
+  // `concern`. Backfill it (and a status when the model said "none") from the
+  // keyword heuristic so resource matching can use signals like "mortgage".
+  const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user')?.content || ''
+  const heuristic = groqService.detectSituation(lastUserMsg)
+  const matchSituation = {
+    ...situation,
+    status: situation?.status && situation.status !== 'none' ? situation.status : heuristic.status,
+    concern: situation?.concern || heuristic.concern,
+  }
+
   // Urgency-aware recommendations (legal/211/shelter rank first for urgent eviction).
-  const recommendedResources = await resourceService.getRecommendedResources(situation, 5)
+  const recommendedResources = await resourceService.getRecommendedResources(matchSituation, 5)
 
   // Ensure the draft references the same top resources shown in chat.
   if (planDraft && (!planDraft.recommendedResources || planDraft.recommendedResources.length === 0)) {
@@ -82,7 +93,15 @@ router.post('/', async (req, res) => {
 
   // `source` ('groq' | 'fallback') is exposed so clients/tests can confirm the
   // AI path was actually used rather than silently degrading to the fallback.
-  res.json({ reply, situation, recommendedResources, conversationId, planAction, planDraft, source })
+  res.json({
+    reply,
+    situation: matchSituation,
+    recommendedResources,
+    conversationId,
+    planAction,
+    planDraft,
+    source,
+  })
 })
 
 export default router

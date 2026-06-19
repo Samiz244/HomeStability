@@ -123,6 +123,13 @@ export function detectSituation(text = '') {
   // "none" matches the prompt's situation.status enum (no actionable situation).
   const situation = { status: 'none', concern: null, income: null, urgency: 'normal' }
 
+  // Homeownership / mortgage signals — mapped to financial_hardship (closest
+  // existing status) with a dedicated "mortgage" concern for resource matching.
+  const isMortgage =
+    /(escrow|mortgage|foreclos|property tax|\bhoa\b|home ?loan|lender|financing|bought the house|own my home|homeowner)/.test(
+      t,
+    )
+
   if (/(homeless|nowhere to (go|stay)|on the street|sleeping in|need (a )?shelter|looking for (a )?shelter|shelter tonight|emergency shelter|need somewhere to stay|place to stay|safe place to stay|need emergency housing|kicked out)/.test(t)) {
     situation.status = 'homelessness'
     situation.urgency = 'immediate'
@@ -132,11 +139,17 @@ export function detectSituation(text = '') {
     situation.urgency = /(tomorrow|today|tonight|24 ?hours|right now|immediately|this week)/.test(t)
       ? 'immediate'
       : 'high'
-  } else if (/(lost my job|laid off|unemployed|reduced income|can'?t afford|financial)/.test(t)) {
+  } else if (
+    isMortgage ||
+    /(lost my job|laid off|unemployed|reduced income|can'?t afford|financial)/.test(t)
+  ) {
     situation.status = 'financial_hardship'
   }
 
-  if (/(utilit|power|electric|water bill|gas bill|disconnect|shut ?off|liheap)/.test(t)) {
+  // Mortgage takes precedence so foreclosure/mortgage resources get boosted.
+  if (isMortgage) {
+    situation.concern = 'mortgage'
+  } else if (/(utilit|power|electric|water bill|gas bill|disconnect|shut ?off|liheap)/.test(t)) {
     situation.concern = 'utilities'
   } else if (/(legal|court|lawyer|attorney|rights|hearing)/.test(t)) {
     situation.concern = 'legal'
@@ -355,7 +368,11 @@ Rules:
       maxTokens: 250,
       temperature: 0.4,
       messages: [
-        { role: 'system', content: HOUSING_COUNSELOR_PROMPT },
+        {
+          role: 'system',
+          content:
+            "You are a helpful housing counselor in Atlanta. Answer the user's question about this specific resource in 2-3 clear, conversational sentences. Be direct and practical. No JSON, no bullet lists, no markdown.",
+        },
         {
           role: 'user',
           content: `Resource: ${resourceName}\nDetails: ${JSON.stringify(
