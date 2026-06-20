@@ -59,6 +59,23 @@ export default function PlanPage() {
     setCompleted(done)
   }, [plan])
 
+  // Diagnostic: surface which recommended resource IDs resolved to real
+  // resources vs which ones didn't (e.g. an AI-hallucinated out-of-range id).
+  useEffect(() => {
+    if (!plan) return
+    const requested = plan.recommendedResources || []
+    const resolved = requested.filter((id) => getById(id))
+    const failed = requested.filter((id) => !getById(id))
+    console.log(
+      '[PlanPage] recommendedResources requested:',
+      requested,
+      '→ resolved:',
+      resolved,
+      '| failed (no matching resource):',
+      failed,
+    )
+  }, [plan, getById])
+
   async function loadPlan() {
     setLoading(true)
     try {
@@ -117,6 +134,10 @@ export default function PlanPage() {
     // Persist to the same plan_tasks.status the AI update path uses.
     plansApi
       .updateTaskStatus(plan.id, id, willComplete ? 'completed' : 'pending')
+      .then(() => {
+        // Tell the right sidebar to refresh its Plan Overview / progress.
+        window.dispatchEvent(new Event('hsg:plan-changed'))
+      })
       .catch(() => {
         // Roll back the optimistic change if it didn't save.
         setCompleted((prev) => {
@@ -145,6 +166,7 @@ export default function PlanPage() {
       setPlan(result.plan)
       setNotice(result.explanation || 'Your plan has been reviewed.')
       setUpdateMsg('')
+      window.dispatchEvent(new Event('hsg:plan-changed'))
     } catch {
       setNotice('Could not update the plan right now. Please try again.')
     } finally {

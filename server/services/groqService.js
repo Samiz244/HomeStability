@@ -279,6 +279,8 @@ export const groqService = {
   "whyResources": { "1": "string" }
 }
 
+Only recommend resources with IDs between 1 and 20. Do not use any other IDs, and do not repeat the same ID.
+
 Detected situation: ${JSON.stringify(situation)}`,
         },
       ],

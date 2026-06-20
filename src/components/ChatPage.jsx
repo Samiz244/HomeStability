@@ -43,6 +43,16 @@ export default function ChatPage() {
   const [preparing, setPreparing] = useState(false)
   const [saving, setSaving] = useState(false)
   const scrollRef = useRef(null)
+  const inputRef = useRef(null)
+
+  // Auto-grow the message textarea up to ~5 lines, then scroll within it.
+  // Runs whenever `input` changes — including the reset to '' after sending.
+  useEffect(() => {
+    const el = inputRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`
+  }, [input])
 
   // Reset to a fresh chat (no DB record is created until the first message).
   const startFresh = () => {
@@ -261,13 +271,22 @@ export default function ChatPage() {
           e.preventDefault()
           send()
         }}
-        className="mt-3 flex items-center gap-2 rounded-2xl border border-gray-300 bg-white px-4 py-2.5 shadow-card"
+        className="mt-3 flex items-end gap-2 rounded-2xl border border-gray-300 bg-white px-4 py-2.5 shadow-card"
       >
-        <input
+        <textarea
+          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            // Enter sends; Shift+Enter inserts a new line.
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              send()
+            }
+          }}
+          rows={1}
           placeholder="Type your message…"
-          className="min-w-0 flex-1 bg-transparent text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none"
+          className="min-w-0 flex-1 resize-none overflow-y-auto bg-transparent text-sm leading-5 text-gray-800 placeholder:text-gray-400 focus:outline-none"
         />
         <button
           type="submit"

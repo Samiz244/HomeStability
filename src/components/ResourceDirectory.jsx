@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronDown, Info, Loader2, Search, SlidersHorizontal } from 'lucide-react'
 import { FILTER_CATEGORIES } from '../data/resources.js' // presentation config only
 import { useResources } from '../ResourcesContext.jsx'
@@ -23,6 +23,18 @@ export default function ResourceDirectory() {
     )
     return [...base, ...extra]
   }, [resources])
+
+  // Pre-apply the category from the URL (?category=...), e.g. from the sidebar's
+  // "Helpful Resources" links. Reacts to the param so back/View-All reset too.
+  const [searchParams] = useSearchParams()
+  const categoryParam = searchParams.get('category')
+  useEffect(() => {
+    if (categoryParam && FILTER_CATEGORIES.includes(categoryParam)) {
+      setActiveCategory(categoryParam)
+    } else if (!categoryParam) {
+      setActiveCategory('All Categories')
+    }
+  }, [categoryParam])
 
   const toggleCat = (c) =>
     setSelectedCats((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]))
