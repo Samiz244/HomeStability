@@ -1,6 +1,6 @@
 <!--
   ════════════════════════════════════════════════════════════════════
-  SUBMISSION CHECKLIST — finish these before submitting on Devpost
+  SUBMISSION CHECKLIST: finish these before submitting on Devpost
   ════════════════════════════════════════════════════════════════════
   [ ] Add the demo video link                      (below, "Demo video")
   [ ] Add Nahom's GitHub handle                     ("Team EDITH" section)
@@ -12,23 +12,24 @@
   ════════════════════════════════════════════════════════════════════
 -->
 
-# 🏠 HomePath — Atlanta Housing Guide
+# 🏠 HomePath: Atlanta Housing Guide
 
-> 🏆 **Hackathon:** USAII Global AI Hackathon 2026 — AI Readiness Qualifier · **Track:** College · **Team:** EDITH
+> 🏆 **Hackathon:** USAII Global AI Hackathon 2026 (AI Readiness Qualifier) · **Track:** College · **Team:** EDITH
+>
 > 🎥 **Demo video:** _[TODO: add your demo video link here]_
 
-An AI-powered web app that helps Atlanta residents facing a housing crisis — eviction, homelessness, utility shutoff, or financial hardship — get **personalized guidance, matched local resources, and a concrete action plan** in minutes.
+An AI-powered web app that helps Atlanta residents facing a housing crisis (eviction, homelessness, utility shutoff, or financial hardship) get **personalized guidance, matched local resources, and a concrete action plan** in minutes.
 
 A user describes their situation in plain language. An AI housing counselor responds with calm, practical next steps, surfaces the most relevant verified Atlanta resources, and can turn the conversation into a saved, step-by-step plan with trackable tasks.
 
-> **Built to work instantly.** The app runs end-to-end with **zero configuration** — no API keys, no database. Add a free AI key and/or a database to unlock the full experience.
+> **Built to work instantly.** The app runs end-to-end with **zero configuration**: no API keys, no database. Add a free AI key and/or a database to unlock the full experience.
 
 ---
 
 ## 🎯 The Problem
 
-<!-- OPTIONAL TODO: This statement is ready to use — tailor it if you'd like. -->
-_In metro Atlanta, thousands of residents face eviction, utility shutoffs, or homelessness every year — yet the help that exists is scattered across dozens of agencies with confusing eligibility rules. People in crisis don't have time to navigate it. **HomePath** meets them where they are: describe your situation in plain language and instantly get the right local resources plus a clear, personalized action plan._
+<!-- OPTIONAL TODO: This statement is ready to use; tailor it if you'd like. -->
+_In metro Atlanta, thousands of residents face eviction, utility shutoffs, or homelessness every year, yet the help that exists is scattered across dozens of agencies with confusing eligibility rules. People in crisis don't have time to navigate it. **HomePath** meets them where they are: describe your situation in plain language and instantly get the right local resources plus a clear, personalized action plan._
 
 ---
 
@@ -46,13 +47,13 @@ _In metro Atlanta, thousands of residents face eviction, utility shutoffs, or ho
 
 ## ✨ Features
 
-- **AI housing counselor** — a warm, context-aware chat that understands the user's situation and gives the most important next step first.
-- **Smart resource matching** — 20 verified Atlanta resources across Rent & Financial Help, Legal Aid, Shelter & Housing, and Utilities, ranked by a dynamic relevance score tailored to the user's situation and urgency.
-- **Personalized action plans** — turn a conversation into a step-by-step plan with priorities, due dates, and live completion tracking. Nothing is saved until the user confirms.
-- **Ask about any resource** — get plain-language answers about eligibility, documents, and how to apply for a specific program.
-- **Save resources & track progress** — bookmark resources and watch a guided progress tracker fill in as you go.
-- **Sign in with Google or continue as a guest** — a session is created automatically so your plan and history persist immediately.
-- **Crisis-aware & safe** — prominent emergency guidance, careful legal-question handling (general info + referral, never case-specific advice), and no storage of sensitive personal data.
+- **AI housing counselor:** a warm, context-aware chat that understands the user's situation and gives the most important next step first.
+- **Smart resource matching:** 20 verified Atlanta resources across Rent & Financial Help, Legal Aid, Shelter & Housing, and Utilities, ranked by a dynamic relevance score tailored to the user's situation and urgency.
+- **Personalized action plans:** turn a conversation into a step-by-step plan with priorities, due dates, and live completion tracking. Nothing is saved until the user confirms.
+- **Ask about any resource:** get plain-language answers about eligibility, documents, and how to apply for a specific program.
+- **Save resources & track progress:** bookmark resources and watch a guided progress tracker fill in as you go.
+- **Sign in with Google or continue as a guest:** a session is created automatically so your plan and history persist immediately.
+- **Crisis-aware & safe:** prominent emergency guidance, careful legal-question handling (general info + referral, never case-specific advice), and no storage of sensitive personal data.
 
 ---
 
@@ -70,14 +71,14 @@ _In metro Atlanta, thousands of residents face eviction, utility shutoffs, or ho
 
 ## 🚀 Quick Start
 
-You need **Node.js 18+** and **two terminals** — one for the API, one for the web app.
+You need **Node.js 18+** and **two terminals**: one for the API, one for the web app.
 
 ### 1. Backend (API)
 
 ```bash
 cd server
 npm install
-cp .env.example .env     # optional — see Configuration below
+cp .env.example .env     # optional, see Configuration below
 npm run dev              # API on http://localhost:3001
 ```
 
@@ -188,7 +189,7 @@ HomeStability/
 ## 🔒 Privacy & Safety
 
 - Sensitive personal information is **not stored**.
-- The AI gives **general** legal/financial information and always refers users to qualified providers (e.g., Atlanta Legal Aid) for case-specific advice — it never promises outcomes or gives case-specific legal advice.
+- The AI gives **general** legal/financial information and always refers users to qualified providers (e.g., Atlanta Legal Aid) for case-specific advice, and never promises outcomes or gives case-specific legal advice.
 - Emergency guidance (call 911 / 211) is surfaced prominently throughout the app.
 
 ---
@@ -217,9 +218,9 @@ HomeStability/
 
 <!-- TODO: Add Nahom's GitHub handle, and adjust any role if needed. -->
 
-- **Samuel Alemu** — _Lead Engineer · Backend & AI_ · [@Samiz244](https://github.com/Samiz244)
-- **Mirenge Innocent** — _Frontend Engineer · UI & App State_ · [@minnocent12](https://github.com/minnocent12)
-- **Nahom Chemeda** — _Product & Resource Research_ · [@handle](https://github.com/)
+- **Samuel Alemu** · _Lead Engineer, Backend & AI_ · [@Samiz244](https://github.com/Samiz244)
+- **Mirenge Innocent** · _Frontend Engineer, UI & App State_ · [@minnocent12](https://github.com/minnocent12)
+- **Nahom Chemeda** · _Product & Resource Research_ · [@handle](https://github.com/)
 
 ---
 
