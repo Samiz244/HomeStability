@@ -31,6 +31,12 @@ export default function RightPanel() {
   useEffect(() => {
     let active = true
 
+    const loadConversations = () =>
+      conversationsApi
+        .list()
+        .then((list) => active && Array.isArray(list) && setHasConversation(list.length > 0))
+        .catch(() => {})
+
     const loadPlan = async () => {
       try {
         const list = await plansApi.list().catch(() => [])
@@ -42,17 +48,22 @@ export default function RightPanel() {
       }
     }
 
-    conversationsApi
-      .list()
-      .then((list) => active && Array.isArray(list) && setHasConversation(list.length > 0))
-      .catch(() => {})
+    loadConversations()
     loadPlan()
 
-    // Re-fetch when plan data changes elsewhere (e.g. checking a task on /plan).
-    const onPlanChanged = () => loadPlan()
+    // Re-fetch when chat/plan flows signal a change, so progress updates live
+    // without a page reload: a new conversation completes "Share your situation",
+    // and plan/task changes refresh the Plan Overview.
+    const onConversationsChanged = () => loadConversations()
+    const onPlanChanged = () => {
+      loadPlan()
+      loadConversations()
+    }
+    window.addEventListener('hsg:conversations-changed', onConversationsChanged)
     window.addEventListener('hsg:plan-changed', onPlanChanged)
     return () => {
       active = false
+      window.removeEventListener('hsg:conversations-changed', onConversationsChanged)
       window.removeEventListener('hsg:plan-changed', onPlanChanged)
     }
   }, [])
@@ -62,12 +73,22 @@ export default function RightPanel() {
   const completedCount = tasks.filter((t) => t.completed).length
   const completion = tasks.length ? Math.round((completedCount / tasks.length) * 100) : 0
 
-  const steps = [
-    { label: 'Share your situation', done: hasConversation },
-    { label: 'Review your options', done: hasPlan },
-    { label: 'Get your plan', done: hasPlan },
-    { label: 'Get resources & reminders', done: savedCount > 0 },
+  // Progress is cumulative: a step is "done" only when its own condition AND
+  // every earlier step are met. This keeps the tracker sequential so a later
+  // step can never show Completed before an earlier one (e.g. saving a resource
+  // before sharing your situation).
+  const stepConditions = [
+    { label: 'Share your situation', met: hasConversation },
+    { label: 'Review your options', met: hasPlan || savedCount > 0 },
+    { label: 'Get your plan', met: hasPlan },
+    { label: 'Get resources & reminders', met: savedCount > 0 },
   ]
+  let prevDone = true
+  const steps = stepConditions.map(({ label, met }) => {
+    const done = prevDone && met
+    prevDone = done
+    return { label, done }
+  })
 
   return (
     <div className="flex flex-col gap-5">
