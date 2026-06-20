@@ -191,6 +191,9 @@ export default function ChatPage() {
       }
       const saved = await plansApi.confirmDraft({ planDraft, situation: situation || {}, planId })
       if (saved?.id) localStorage.setItem('hsg_plan_id', saved.id)
+      // Notify the sidebar so "Review your options" / "Get your plan" check
+      // immediately on save — not only after a task is later toggled.
+      window.dispatchEvent(new Event('hsg:plan-changed'))
       setPreviewOpen(false)
       navigate('/plan')
     } finally {
