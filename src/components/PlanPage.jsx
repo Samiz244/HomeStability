@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   ArrowRight,
@@ -40,6 +40,16 @@ export default function PlanPage() {
   const [updateMsg, setUpdateMsg] = useState('')
   const [updating, setUpdating] = useState(false)
   const [notice, setNotice] = useState('')
+  const updateRef = useRef(null)
+
+  // Auto-grow the "Update Your Plan" textarea up to ~5 lines, then scroll within
+  // it. Runs whenever `updateMsg` changes — including the reset to '' after submit.
+  useEffect(() => {
+    const el = updateRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`
+  }, [updateMsg])
 
   // DB-first load: discover the active plan id from GET /api/plans (never guess
   // or construct an id), then fetch its full detail from GET /api/plans/:id.
@@ -378,13 +388,22 @@ export default function PlanPage() {
             e.preventDefault()
             submitUpdate()
           }}
-          className="mt-3 flex items-center gap-2 rounded-xl border border-gray-300 px-4 py-2.5"
+          className="mt-3 flex items-end gap-2 rounded-xl border border-gray-300 px-4 py-2.5"
         >
-          <input
+          <textarea
+            ref={updateRef}
             value={updateMsg}
             onChange={(e) => setUpdateMsg(e.target.value)}
+            onKeyDown={(e) => {
+              // Enter submits; Shift+Enter inserts a new line.
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                submitUpdate()
+              }
+            }}
+            rows={1}
             placeholder="e.g. I found a new job and caught up on rent"
-            className="min-w-0 flex-1 bg-transparent text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none"
+            className="min-w-0 flex-1 resize-none overflow-y-auto bg-transparent text-sm leading-5 text-gray-800 placeholder:text-gray-400 focus:outline-none"
           />
           <button
             type="submit"

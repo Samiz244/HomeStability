@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -202,6 +202,16 @@ function AskResourcePanel({ resource }) {
   const [question, setQuestion] = useState('')
   const [thread, setThread] = useState([]) // { role: 'user' | 'ai', text }
   const [loading, setLoading] = useState(false)
+  const inputRef = useRef(null)
+
+  // Auto-grow the question textarea up to ~5 lines, then scroll within it.
+  // Runs whenever `question` changes — including the reset to '' after asking.
+  useEffect(() => {
+    const el = inputRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`
+  }, [question])
 
   const ask = async (q) => {
     const text = (q ?? question).trim()
@@ -280,14 +290,22 @@ function AskResourcePanel({ resource }) {
           e.preventDefault()
           ask()
         }}
-        className="mt-4 flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2"
+        className="mt-4 flex items-end gap-2 rounded-lg border border-gray-300 px-3 py-2"
       >
-        <input
+        <textarea
+          ref={inputRef}
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          type="text"
+          onKeyDown={(e) => {
+            // Enter sends; Shift+Enter inserts a new line.
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              ask()
+            }
+          }}
+          rows={1}
           placeholder="Type your question..."
-          className="min-w-0 flex-1 bg-transparent text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none"
+          className="min-w-0 flex-1 resize-none overflow-y-auto bg-transparent text-sm leading-5 text-gray-700 placeholder:text-gray-400 focus:outline-none"
         />
         <button
           type="submit"
