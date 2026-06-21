@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { groqService } from './groqService.js'
 import { matchingService } from './matchingService.js'
 import { resourceService } from './resourceService.js'
@@ -20,7 +21,6 @@ const FIELD_TO_COLUMN = {
 
 /* -------------------------- in-memory fallback -------------------------- */
 const memPlans = new Map()
-let memCounter = 0
 
 /* ------------------------------ public API ------------------------------ */
 export const planService = {
@@ -362,8 +362,14 @@ async function dbApplyChanges(existing, changes) {
 
 /* --------------------------- in-memory helpers -------------------------- */
 function memCreate(situation, plan, userId = null) {
-  const id = `plan-${++memCounter}`
+  // Use a real UUID so the in-memory id satisfies the same UUID validation the
+  // plan routes enforce (a "plan-N" id would be 404'd by GET /plans/:id).
+  const id = randomUUID()
   const stored = { id, userId, createdAt: new Date().toISOString(), situation, ...plan }
+  // Give each task a UUID id too (mirrors the Postgres path, where the DB
+  // assigns task UUIDs). Otherwise the AI's integer task ids would be rejected
+  // by the UUID-validated PATCH /plans/:planId/tasks/:taskId route.
+  stored.tasks = (stored.tasks || []).map((t) => ({ ...t, id: randomUUID() }))
   memPlans.set(id, stored)
   return stored
 }
@@ -385,7 +391,11 @@ function memUpdateFromDraft(planId, draft) {
     summary: draft.summary ?? existing.summary,
     estimatedTimeline: draft.estimatedTimeline ?? existing.estimatedTimeline,
     nextBestAction: draft.nextBestAction ?? existing.nextBestAction,
-    tasks: draft.tasks ?? existing.tasks,
+    // A fresh draft's tasks carry integer ids — reassign UUIDs so they remain
+    // togglable (the task route validates UUIDs). Existing tasks already have them.
+    tasks: draft.tasks
+      ? draft.tasks.map((t) => ({ ...t, id: randomUUID() }))
+      : existing.tasks,
     recommendedResources: draft.recommendedResources ?? existing.recommendedResources,
     updatedAt: new Date().toISOString(),
   }
@@ -414,11 +424,12 @@ export function applyChanges(plan, changes = []) {
       case 'tasksAdd': {
         const additions = (change.value || [])
           .filter((t) => t?.title)
-          .map((t, i) => ({
-            id: t.id ?? nextTaskId(next.tasks) + i,
+          .map((t) => ({
             completed: false,
             priority: 'Medium',
             ...t,
+            // UUID id so AI-added tasks are togglable via the task route.
+            id: randomUUID(),
           }))
         next.tasks = [...next.tasks, ...additions]
         break
@@ -451,8 +462,4 @@ export function applyChanges(plan, changes = []) {
   }
   next.updatedAt = new Date().toISOString()
   return { plan: next, skipped }
-}
-
-function nextTaskId(tasks) {
-  return tasks.reduce((max, t) => Math.max(max, Number(t.id) || 0), 0) + 1
 }
