@@ -2,7 +2,6 @@
   ════════════════════════════════════════════════════════════════════
   SUBMISSION CHECKLIST: finish these before submitting on Devpost
   ════════════════════════════════════════════════════════════════════
-  [ ] Add the demo video link                      (below, "Demo video")
   [ ] Add Nahom's GitHub handle                     ("Team EDITH" section)
   [ ] Double-check each teammate's role is accurate ("Team EDITH" section)
   [ ] (Optional) Tailor the Problem statement       ("The Problem" section)
@@ -16,7 +15,7 @@
 
 > 🏆 **Hackathon:** USAII Global AI Hackathon 2026 (AI Readiness Qualifier) · **Track:** College · **Team:** EDITH
 >
-> 🎥 **Demo video:** _[TODO: add your demo video link here]_
+> 🎥 **Demo video:** [Watch on YouTube](https://youtu.be/81Nm53fnkA8)
 
 An AI-powered web app that helps Atlanta residents facing a housing crisis (eviction, homelessness, utility shutoff, or financial hardship) get **personalized guidance, matched local resources, and a concrete action plan** in minutes.
 
